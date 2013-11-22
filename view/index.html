@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>Dot App</title>
+    <link rel="stylesheet" href="../resources/css/app.css"/>
+    <script type="text/javascript" src="../resources/lib/jquery.js" ></script>
+    <script type="text/javascript" src="../resources/lib/amplify.js" ></script>
+
+    <script type="text/javascript" src="../controller/app.js" ></script>
+    <script type="text/javascript" src="../controller/game.js" ></script>
+    <script type="text/javascript" src="../controller/board.js" ></script>
+    <script type="text/javascript" src="../controller/line.js" ></script>
+    <script type="text/javascript" src="../controller/cell.js" ></script>
+    <script type="text/javascript" src="../controller/dot.js" ></script>
+    <script type="text/javascript">
+        console.log("bootstrapping...");
+        var App = {};
+        
+        $(document).ready(function(){
+            $('body').data( {
+                colors : ['red','yellow','blue','green','purple']
+            });
+            
+            App.game = new Game;
+            return;
+        });
+    </script>
+</head>
+<body>
+    <div class="board"></div>
+</body>
+</html>

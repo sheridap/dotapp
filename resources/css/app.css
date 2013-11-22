@@ -1,0 +1,55 @@
+.board{
+    width : 253px;
+    height: 253px;
+    border: 1px solid black;
+}
+
+.dot{
+    width : 20px;
+    height: 20px;
+    border-radius: 20px;
+    margin: 10px;
+}
+
+.cell {
+    width       : 40px;
+    height      : 40px;
+    border      : 1px solid ;
+    float       : left;
+    border-color: #fff;
+    -webkit-touch-callout: none;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: -moz-none;
+-ms-user-select: none;
+user-select: none;
+}
+
+.black {
+    border-color: #ccc !important;
+}
+
+.green{
+    background-color: #90ee90;
+    border-color: #32cd32;
+}
+
+.red{
+    background-color: #f08080;
+    border-color: #EE5757;
+}
+
+.blue{
+    background-color: #add8e6;
+    border-color: #528CE0;
+}
+
+.yellow{
+    background-color: #ffd700;
+    border-color: #b8860b;
+}
+
+.purple{
+    background-color: #9370db;
+    border-color: #8a2be2;
+}
