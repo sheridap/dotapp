@@ -12,6 +12,8 @@ function Cell(config) {
     this.index      = config.index || null;
     this.dot        = config.dot    || null;
     this.el         = $("<div id="+ config.id +" class=cell />");
+    this.above      = null; // tracks cell above
+    this.below      = null; // tracks cell below
 //    this.x = this.el.style.left;
 //    this.y = this.el.style.top;
     this.init();
@@ -35,6 +37,11 @@ Cell.prototype.removeDot = function(){
     this.el.removeClass('black');
     this.dot = null;
 //    this.dot.destroy();
+    amplify.publish( "cellEvent", {
+        'cell' : this,
+        'event': 'remove'
+    });
+
 };
 
 Cell.prototype.makeDOM = function(){

@@ -21,18 +21,19 @@ Game.prototype.init = function() {
     this.lineManager = new LineManager();
     this.lineManager.game = this;
 
-    // make the board
+    // make the board cells
     this.initBoard();
 
-    // make the first batch of dots
+    // make the first batch of dots and add them to cells
     this.createDots();
+
+    //
 
 
     // monitor the Board
     // start game timer
     //
 
-    return ;
 };
 
 /*
@@ -48,11 +49,17 @@ Game.prototype.initBoard = function() {
               "col" : j,
               "index" : (i * 6) - 6 + j -1
           });
+          //set cell above reference
+          var aboveIndex =  cell.index - 6;
+          cell.above =  (cell.index > 5)? this.board[aboveIndex]: null;
+          // set current cell as 'below cell' to it's 'above cell'
+          var cellAbove = this.board[aboveIndex];
+          if(cell.above) cellAbove.below = cell;
+
           this.board.push(cell);
           this.boardEl.append(cell.el);
       }
   }
-  return;
 };
 
 
@@ -71,5 +78,4 @@ Game.prototype.createDots = function() {
         }
     });
     amplify.publish( "boardUpdated");
-    return;
 };

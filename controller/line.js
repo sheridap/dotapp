@@ -123,6 +123,8 @@ LineManager.prototype.clearLine = function(){
 //          and ideally animate the new dots in
 //
     var chain = this.cellChain;
+    console.log(chain);
+
     chain.forEach(function(cell){
         console.log('[[[[[  DESTROYING DOTS     ]]]');
         cell.removeDot();
@@ -137,7 +139,7 @@ LineManager.prototype.clearLine = function(){
 
 //    now shift all the dots down
 //    starting at the bottom row for every cell in the board
-    var board = this.board;
+    var board = this.game.board;
 //  check the first row of the board
 //  and iterate for each 'column' and then shift dots down
     for(var i = 0; i < 6; i++){
@@ -149,12 +151,13 @@ LineManager.prototype.clearLine = function(){
             var index = i + (j * 6);
             col.push(board[index]);
         }
-
 //        now go through the column and collapse down the dots
+        // need work this array backwards
         for(var k = 0; k < col.length; k++){
-            
-        }
+            if(col.dot === null && k < 0){
 
+            }
+        }
     }
 
 };
