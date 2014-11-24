@@ -12,12 +12,11 @@ function Cell(config) {
     this.index      = config.index || null;
     this.dot        = config.dot    || null;
     this.el         = $("<div id="+ config.id +" class=cell />");
-    this.above      = null; // tracks cell above
-    this.below      = null; // tracks cell below
-//    this.x = this.el.style.left;
-//    this.y = this.el.style.top;
+    this.above      = null; // tracks the cell above if it exists
+    this.below      = null; // tracks the cell below if it exists
+    this.events     = amplify.subscribe( "cellEvent", this, this.handleCellEvent);
+
     this.init();
-    return;
 };
 
 Cell.prototype.addDot = function(){
@@ -37,6 +36,7 @@ Cell.prototype.removeDot = function(){
     this.el.removeClass('black');
     this.dot = null;
 //    this.dot.destroy();
+
     amplify.publish( "cellEvent", {
         'cell' : this,
         'event': 'remove'
@@ -82,6 +82,27 @@ Cell.prototype.init = function(){
         });
     });
 
+};
+
+Cell.prototype.handleCellEvent = function(data){
+    // handle empty cells in the first row
+    if(data.event === "remove" && this.dot ===null && this.above === null){
+        console.log("trying to add dot to first row cell");
+        this.addDot();
+    }
+
+    //handle all other empty cells
+    if(data.event === "remove" && this.dot === null && this.above !== null){
+        this.dot = this.above.dot;
+        this.el.append(this.above.dot.el);
+        this.above.removeDot();
+    }
+
+};
+
+Cell.prototype.move = function(){
+//    moves the cell's dot down to the lowest available empty cell
+    amplify.subscribe()
 };
 
 Cell.prototype.notifyLineManager = function(){

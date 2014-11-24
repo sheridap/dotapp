@@ -153,9 +153,16 @@ LineManager.prototype.clearLine = function(){
         }
 //        now go through the column and collapse down the dots
         // need work this array backwards
-        for(var k = 0; k < col.length; k++){
-            if(col.dot === null && k < 0){
-
+        for(var k = col.length -1; k > 0; k--){
+        //for(var k = 0; k < col.length; k++){
+            var currentCell = col[k];
+            //console.log("currentCell: ");
+            //console.log(currentCell);
+            if(currentCell.dot === null ){ //&& k < 0
+                //console.log("attempting to move dot");
+                var dotAbove = currentCell.above.dot;
+                currentCell.dot = dotAbove;
+                currentCell.el.append(dotAbove.el);
             }
         }
     }
