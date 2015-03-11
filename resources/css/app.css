@@ -1,10 +1,50 @@
-.board{
-    width : 253px;
-    height: 253px;
-    border: 1px solid black;
+/*
+ * Fonts
+ */
+@import url(http://fonts.googleapis.com/css?family=Lato:400,900);
+
+
+/*
+ * Layout
+ */
+html {
+    background: #f9f9f9;
 }
 
-.dot{
+.wrapper {
+    margin: 5% 0 0;
+    width: 100%;
+}
+.container {
+    background: #ffffff;
+    box-shadow: 0 0 5px gray;
+    -webkit-box-shadow: 0 0 5px gray;
+    margin: 0 auto;
+    padding: 60px 0;
+    width: 480px;
+}
+
+/*
+ * Typography
+ */
+.title {
+    color: #334651;
+    font: 900 88px/1.0 'Lato', sans-serif;
+    margin: 0;
+    text-align : center;
+    text-shadow: 1px 1px 0 #ffd700, 4px 4px 0 #9370db, 7px 7px 0 #EE5757, 10px 10px 0 #90ee90;
+}
+
+/*
+ * Game board
+ */
+.board {
+    height: 253px;
+    margin: 60px auto 0;
+    width : 253px;
+}
+
+.dot {
     width : 20px;
     height: 20px;
     border-radius: 20px;
@@ -12,44 +52,101 @@
 }
 
 .cell {
-    width       : 40px;
-    height      : 40px;
-    border      : 1px solid ;
+    width       : 42px;
+    height      : 42px;
+    border      : none;
     float       : left;
-    border-color: #fff;
     -webkit-touch-callout: none;
--webkit-user-select: none;
--khtml-user-select: none;
--moz-user-select: -moz-none;
--ms-user-select: none;
-user-select: none;
+    -webkit-user-select: none;
+    -html-user-select: none;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .black {
-    border-color: #ccc !important;
+    transform: scale(1.5);
+    -moz-transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+    /* bubble Anim */
+    -webkit-animation-name:            bubble;
+    -webkit-animation-direction:       alternate;
+    -webkit-animation-duration:        0.25s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: cubic-bezier(0.4, -0.3, 0.4, 1);
+    -moz-animation-name:            bubble;
+    -moz-animation-direction:       alternate;
+    -moz-animation-duration:        0.25s;
+    -moz-animation-iteration-count: 1;
+    -moz-animation-timing-function: cubic-bezier(0.4, -0.3, 0.4, 1);
+    animation-name:            bubble;
+    animation-direction:       alternate;
+    animation-duration:        0.25s;
+    animation-iteration-count: 1;
+    animation-timing-function: cubic-bezier(0.4, -0.3, 0.4, 1);
 }
 
 .green{
     background-color: #90ee90;
-    border-color: #32cd32;
+}
+.black .green {
+    box-shadow: 2px 2px 2px rgba(144, 238, 144, 0.5);
+    -webkit-box-shadow: 2px 2px 2px rgba(144, 238, 144, 0.5);
 }
 
-.red{
+.red {
     background-color: #f08080;
-    border-color: #EE5757;
+}
+.black .red {
+    box-shadow: 2px 2px 2px rgba(240, 128, 128, 0.5);
+    -webkit-box-shadow: 2px 2px 2px rgba(240, 128, 128, 0.5);
 }
 
-.blue{
+.blue {
     background-color: #add8e6;
-    border-color: #528CE0;
+}
+.black .blue {
+    box-shadow: 2px 2px 2px rgba(173, 216, 230, 0.5);
+    -webkit-box-shadow: 2px 2px 2px rgba(173, 216, 230, 0.5);
 }
 
-.yellow{
+.yellow {
     background-color: #ffd700;
-    border-color: #b8860b;
+}
+.black .yellow {
+    box-shadow: 2px 2px 2px rgba(255, 215, 0, 0.33);
+    -webkit-box-shadow: 2px 2px 2px rgba(255, 215, 0, 0.37);
 }
 
-.purple{
+.purple {
     background-color: #9370db;
-    border-color: #8a2be2;
+}
+.black .purple {
+    box-shadow: 2px 2px 2px rgba(147, 112, 219, 0.5);
+    -webkit-box-shadow: 2px 2px 2px rgba(147, 112, 219, 0.5);
+}
+
+/*
+ * Animations
+ */
+@-webkit-keyframes bubble {
+    0%   { -webkit-transform: scale(0.85); }
+    15%  { -webkit-transform: scale(1.0); }
+    35%  { -webkit-transform: scale(1.25); }
+    75%  { -webkit-transform: scale(0.85); }
+    100% { -webkit-transform: scale(1.33); }
+}
+@-moz-keyframes bubble {
+    0%   { -moz-transform: scale(0.85); }
+    15%  { -moz-transform: scale(1.0); }
+    35%  { -moz-transform: scale(1.25); }
+    75%  { -moz-transform: scale(0.85); }
+    100% { -moz-transform: scale(1.33); }
+}
+@keyframes bubble {
+    0%   { transform: scale(0.85); }
+    15%  { transform: scale(1.0); }
+    35%  { transform: scale(1.25); }
+    75%  { transform: scale(0.85); }
+    100% { transform: scale(1.33); }
 }
