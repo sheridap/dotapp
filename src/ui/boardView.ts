@@ -1,5 +1,5 @@
 import { CELL_COUNT, SIZE, colOf, rowOf } from '../game/board';
-import { chainColor } from '../game/chain';
+import { capturedCells, chainColor } from '../game/chain';
 import type { GameState } from '../game/game';
 import type { CellIndex } from '../game/types';
 
@@ -45,11 +45,14 @@ export function createBoardView(root: HTMLElement, handlers: PointerHandlers): B
   const svg = document.createElementNS(SVG_NS, 'svg');
   svg.setAttribute('class', 'connector');
   svg.setAttribute('viewBox', `0 0 ${String(SIZE)} ${String(SIZE)}`);
+  const loopFill = document.createElementNS(SVG_NS, 'polygon');
+  loopFill.setAttribute('class', 'loop-fill');
   const path = document.createElementNS(SVG_NS, 'polyline');
-  svg.append(path);
+  svg.append(loopFill, path);
   root.append(svg);
 
   let dragging = false;
+  let wasClosed = false;
 
   function cellIndexAt(x: number, y: number): CellIndex | null {
     const el = document.elementFromPoint(x, y);
@@ -104,8 +107,11 @@ export function createBoardView(root: HTMLElement, handlers: PointerHandlers): B
   window.addEventListener('blur', onBlur);
 
   function render(state: GameState): void {
-    const linked = new Set(state.chain?.cells ?? []);
-    const loopColor = state.chain?.closed ? chainColor(state.board, state.chain) : null;
+    const chain = state.chain;
+    const linked = new Set(chain?.cells ?? []);
+    const closed = chain?.closed ?? false;
+    const loopColor = chain && closed ? chainColor(state.board, chain) : null;
+    const captured = chain ? capturedCells(chain) : new Set<CellIndex>();
 
     state.board.forEach((color, i) => {
       const dot = dots[i];
@@ -114,22 +120,43 @@ export function createBoardView(root: HTMLElement, handlers: PointerHandlers): B
       dot.className = `dot ${color}`;
       cell.classList.toggle('linked', linked.has(i));
       cell.classList.toggle('loop', loopColor !== null && color === loopColor);
+      cell.classList.toggle('captured', captured.has(i));
     });
 
-    if (state.chain && state.chain.cells.length > 1) {
-      path.setAttribute(
-        'points',
-        state.chain.cells
-          .map((i) => `${String(colOf(i) + 0.5)},${String(rowOf(i) + 0.5)}`)
-          .join(' '),
-      );
-      path.setAttribute('class', chainColor(state.board, state.chain));
+    if (chain && chain.cells.length > 1) {
+      path.setAttribute('points', pointsOf(chain.cells));
+      path.setAttribute('class', chainColor(state.board, chain));
     } else {
       path.removeAttribute('points');
       path.removeAttribute('class');
     }
 
+    if (chain && closed && loopColor) {
+      // The loop proper starts at the first occurrence of the closing cell.
+      const closingCell = chain.cells[chain.cells.length - 1];
+      const start = closingCell === undefined ? 0 : chain.cells.indexOf(closingCell);
+      loopFill.setAttribute('points', pointsOf(chain.cells.slice(start)));
+      loopFill.setAttribute('class', `loop-fill ${loopColor}`);
+    } else {
+      loopFill.removeAttribute('points');
+      loopFill.setAttribute('class', 'loop-fill');
+    }
+
+    // Retrigger the close animation on each open-to-closed transition.
+    if (closed && !wasClosed) {
+      root.classList.remove('closing');
+      root.getBoundingClientRect(); // force a reflow so the animation restarts
+      root.classList.add('closing');
+    } else if (!closed) {
+      root.classList.remove('closing');
+    }
+    wasClosed = closed;
+
     root.classList.toggle('over', state.status === 'over');
+  }
+
+  function pointsOf(indices: readonly CellIndex[]): string {
+    return indices.map((i) => `${String(colOf(i) + 0.5)},${String(rowOf(i) + 0.5)}`).join(' ');
   }
 
   function destroy(): void {

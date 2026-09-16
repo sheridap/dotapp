@@ -129,6 +129,102 @@ body {
   animation: pulse 500ms ease-in-out infinite alternate;
 }
 
+/* Dots trapped inside a closed loop: shrink, ring, and quiver. */
+.cell.captured .dot {
+  animation: capture 420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  box-shadow: 0 0 0 3px var(--muted);
+}
+
+@keyframes capture {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(0.65);
+    opacity: 0.85;
+  }
+}
+
+/* One-shot burst when the loop closes. */
+.board.closing {
+  animation: thump 280ms ease-out;
+}
+
+.board.closing .connector polyline {
+  animation: flash 520ms ease-out;
+}
+
+@keyframes thump {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.025);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes flash {
+  0% {
+    stroke-width: 0.14;
+    filter: drop-shadow(0 0 0 currentColor);
+  }
+  30% {
+    stroke-width: 0.3;
+    filter: drop-shadow(0 0 0.35px currentColor) brightness(1.5);
+  }
+  100% {
+    stroke-width: 0.14;
+    filter: drop-shadow(0 0 0 currentColor);
+  }
+}
+
+.loop-fill {
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke: none;
+}
+
+.loop-fill.red,
+.loop-fill.yellow,
+.loop-fill.blue,
+.loop-fill.green,
+.loop-fill.purple {
+  animation: fill-in 380ms ease-out forwards;
+}
+
+@keyframes fill-in {
+  from {
+    fill-opacity: 0;
+  }
+  to {
+    fill-opacity: 0.22;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .board.closing,
+  .board.closing .connector polyline,
+  .cell.captured .dot,
+  .cell.loop .dot {
+    animation: none;
+  }
+  .loop-fill.red,
+  .loop-fill.yellow,
+  .loop-fill.blue,
+  .loop-fill.green,
+  .loop-fill.purple {
+    animation: none;
+    fill-opacity: 0.22;
+  }
+}
+
 @keyframes pulse {
   from {
     transform: scale(1.1);
@@ -141,27 +237,27 @@ body {
 .dot.red,
 .connector .red {
   background: var(--red);
-  stroke: var(--red);
+  color: var(--red);
 }
 .dot.yellow,
 .connector .yellow {
   background: var(--yellow);
-  stroke: var(--yellow);
+  color: var(--yellow);
 }
 .dot.blue,
 .connector .blue {
   background: var(--blue);
-  stroke: var(--blue);
+  color: var(--blue);
 }
 .dot.green,
 .connector .green {
   background: var(--green);
-  stroke: var(--green);
+  color: var(--green);
 }
 .dot.purple,
 .connector .purple {
   background: var(--purple);
-  stroke: var(--purple);
+  color: var(--purple);
 }
 
 .connector {
@@ -174,6 +270,7 @@ body {
 
 .connector polyline {
   fill: none;
+  stroke: currentColor;
   stroke-width: 0.14;
   stroke-linecap: round;
   stroke-linejoin: round;
