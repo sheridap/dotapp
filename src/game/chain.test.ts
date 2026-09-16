@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cellsToClear, startChain, stepChain, type Chain } from './chain';
+import { capturedCells, cellsToClear, startChain, stepChain, type Chain } from './chain';
 import { grid } from './testing';
 
 const board = grid(`
@@ -82,5 +82,71 @@ describe('cellsToClear', () => {
   it('clears every dot of the color for a closed loop', () => {
     const cleared = cellsToClear(board, walk(0, [1, 7, 6, 0]));
     expect([...cleared].sort((a, b) => a - b)).toEqual([0, 1, 6, 7, 12]);
+  });
+});
+
+describe('enclosure capture', () => {
+  const ring = grid(`
+    r r r b b b
+    r g r b b b
+    r r r b b b
+    b b b b b b
+    b b b b b b
+    b b b b b r
+  `);
+  const sorted = (s: Set<number>) => [...s].sort((a, b) => a - b);
+
+  function loop(b: typeof ring, start: number, path: number[]): Chain {
+    let chain = startChain(start);
+    for (const i of path) chain = stepChain(b, chain, i).chain;
+    expect(chain.closed).toBe(true);
+    return chain;
+  }
+
+  it('a 3x3 ring captures its center', () => {
+    const chain = loop(ring, 0, [1, 2, 8, 14, 13, 12, 6, 0]);
+    expect(sorted(capturedCells(chain))).toEqual([7]);
+    expect(sorted(cellsToClear(ring, chain))).toEqual([0, 1, 2, 6, 7, 8, 12, 13, 14, 35]);
+  });
+
+  it('a 2x2 loop captures nothing', () => {
+    const chain = loop(board, 0, [1, 7, 6, 0]);
+    expect(capturedCells(chain).size).toBe(0);
+  });
+
+  it('an open chain captures nothing', () => {
+    expect(capturedCells(startChain(0)).size).toBe(0);
+  });
+
+  it('a ring with a tail still captures only the ring interior', () => {
+    const tailed = grid(`
+      r r r b b b
+      r g r b b b
+      r r r b b b
+      r b b b b b
+      b b b b b b
+      b b b b b b
+    `);
+    const chain = loop(tailed, 18, [12, 6, 0, 1, 2, 8, 14, 13, 12]);
+    expect(sorted(capturedCells(chain))).toEqual([7]);
+  });
+
+  it('a 4x4 ring captures a mixed 2x2 interior', () => {
+    const big = grid(`
+      y y y y b b
+      y g p y b b
+      y b r y b b
+      y y y y b b
+      b b b b b b
+      b b b b b b
+    `);
+    const chain = loop(big, 0, [1, 2, 3, 9, 15, 21, 20, 19, 18, 12, 6, 0]);
+    expect(sorted(capturedCells(chain))).toEqual([7, 8, 13, 14]);
+    expect(cellsToClear(big, chain).size).toBe(16);
+  });
+
+  it('the board edge is not a wall: a corner loop leaves outside cells alone', () => {
+    const chain = loop(board, 0, [1, 7, 6, 0]);
+    expect(cellsToClear(board, chain).has(2)).toBe(false);
   });
 });

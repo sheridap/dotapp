@@ -36,5 +36,7 @@ an injected `Rng`, so tests use fixed boards and seeded refills.
 - Stepping back onto the previous dot undoes the last link.
 - Revisiting any earlier dot in the path closes a loop. A closed loop clears the whole color, and
   the refill for that turn never uses that color.
+- A closed loop also captures every dot trapped inside it, whatever its color. The board edge does
+  not count as a wall, so only a full ring captures.
 - Releasing on a single dot clears nothing and spends no move.
 - Cleared columns collapse downward and refill from the top.

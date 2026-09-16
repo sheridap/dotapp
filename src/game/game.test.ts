@@ -78,6 +78,23 @@ describe('game state machine', () => {
     expect(s.board[1]).toBe('yellow');
   });
 
+  it('captured dots score and clear along with the loop color', () => {
+    const ring = grid(`
+      r r r b b b
+      r g r b b b
+      r r r b b b
+      b b b b b b
+      b b b b b b
+      b b b b b b
+    `);
+    let s = pointerDown(fixture({ board: ring }), 0);
+    for (const i of [1, 2, 8, 14, 13, 12, 6, 0]) s = pointerEnter(s, i);
+    s = pointerUp(s, constantRng(1)); // blue once red is excluded
+    expect(s.score).toBe(9);
+    expect(s.board.filter((c) => c === 'green')).toHaveLength(0);
+    expect(s.board.filter((c) => c === 'red')).toHaveLength(0);
+  });
+
   it('ignores moves that are not valid extensions', () => {
     const s = pointerEnter(pointerDown(fixture(), 0), 2);
     expect(s.chain?.cells).toEqual([0]);

@@ -1,4 +1,4 @@
-import { areAdjacent, cellsOfColor, colorAt } from './board';
+import { areAdjacent, cellsOfColor, colorAt, enclosedCells } from './board';
 import type { Board, CellIndex, Color } from './types';
 
 /**
@@ -56,12 +56,22 @@ export function stepChain(board: Board, chain: Chain, index: CellIndex): ChainRe
   return { chain: { cells: [...cells, index], closed: false }, step: 'extended' };
 }
 
+/** Cells of any color trapped inside a closed loop. Empty for an open chain. */
+export function capturedCells(chain: Chain): Set<CellIndex> {
+  if (!chain.closed) return new Set();
+  return enclosedCells(new Set(chain.cells));
+}
+
 /**
- * Which cells a release would clear. A closed loop takes every dot of the chain's color; a path
- * of two or more takes itself; a single dot takes nothing.
+ * Which cells a release would clear. A closed loop takes every dot of the chain's color plus every
+ * dot it encloses; a path of two or more takes itself; a single dot takes nothing.
  */
 export function cellsToClear(board: Board, chain: Chain): Set<CellIndex> {
-  if (chain.closed) return cellsOfColor(board, chainColor(board, chain));
+  if (chain.closed) {
+    const out = cellsOfColor(board, chainColor(board, chain));
+    for (const i of capturedCells(chain)) out.add(i);
+    return out;
+  }
   if (chain.cells.length >= 2) return new Set(chain.cells);
   return new Set();
 }

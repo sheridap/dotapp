@@ -34,6 +34,53 @@ export function areAdjacent(a: CellIndex, b: CellIndex): boolean {
   return dr + dc === 1;
 }
 
+/** Orthogonal neighbors of a cell, in bounds. */
+export function neighborsOf(i: CellIndex): CellIndex[] {
+  const r = rowOf(i);
+  const c = colOf(i);
+  const out: CellIndex[] = [];
+  if (r > 0) out.push(indexOf(r - 1, c));
+  if (r < SIZE - 1) out.push(indexOf(r + 1, c));
+  if (c > 0) out.push(indexOf(r, c - 1));
+  if (c < SIZE - 1) out.push(indexOf(r, c + 1));
+  return out;
+}
+
+function isBorder(i: CellIndex): boolean {
+  const r = rowOf(i);
+  const c = colOf(i);
+  return r === 0 || c === 0 || r === SIZE - 1 || c === SIZE - 1;
+}
+
+/**
+ * Cells fenced off from the board edge by `walls`: everything that is not a wall and cannot be
+ * reached from a non-wall border cell by orthogonal steps. The board edge itself is not a wall,
+ * so only a genuine ring captures anything.
+ */
+export function enclosedCells(walls: ReadonlySet<CellIndex>): Set<CellIndex> {
+  const reachable = new Set<CellIndex>();
+  const stack: CellIndex[] = [];
+  for (let i = 0; i < CELL_COUNT; i++) {
+    if (isBorder(i) && !walls.has(i)) {
+      reachable.add(i);
+      stack.push(i);
+    }
+  }
+  for (let next = stack.pop(); next !== undefined; next = stack.pop()) {
+    for (const n of neighborsOf(next)) {
+      if (!walls.has(n) && !reachable.has(n)) {
+        reachable.add(n);
+        stack.push(n);
+      }
+    }
+  }
+  const out = new Set<CellIndex>();
+  for (let i = 0; i < CELL_COUNT; i++) {
+    if (!walls.has(i) && !reachable.has(i)) out.add(i);
+  }
+  return out;
+}
+
 export function randomColor(rng: Rng, colors: readonly Color[] = COLORS): Color {
   const idx = Math.floor(rng() * colors.length);
   const color = colors[idx] ?? colors[0];
