@@ -1,6 +1,7 @@
 dotapp
 ======
-This is a JavaScript port of the popular Dots iPhone App from Betaworks One.  https://itunes.apple.com/us/app/dots-a-game-about-connecting/id632285588
+
+This is a JavaScript port of the popular Dots iPhone App from Betaworks One. https://itunes.apple.com/us/app/dots-a-game-about-connecting/id632285588
 
 This project got started as a vacation project I created to kick the tires on Angular.js and work some of the rust out of my coding skills.
 
