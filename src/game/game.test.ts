@@ -20,7 +20,15 @@ const board = grid(`
 `);
 
 function fixture(overrides: Partial<GameState> = {}): GameState {
-  return { board, chain: null, score: 0, movesLeft: 30, status: 'playing', ...overrides };
+  return {
+    board,
+    chain: null,
+    score: 0,
+    movesLeft: 30,
+    status: 'playing',
+    history: [],
+    ...overrides,
+  };
 }
 
 describe('game state machine', () => {
@@ -112,6 +120,25 @@ describe('game state machine', () => {
     const s = pointerCancel(pointerEnter(pointerDown(fixture(), 0), 1));
     expect(s.chain).toBeNull();
     expect(s.movesLeft).toBe(30);
+  });
+
+  it('records each spent move in history', () => {
+    let s = pointerDown(fixture(), 13);
+    s = pointerEnter(s, 14);
+    s = pointerUp(s, constantRng(0));
+    s = pointerDown(s, 0);
+    for (const i of [1, 7, 6, 0]) s = pointerEnter(s, i);
+    s = pointerUp(s, constantRng(1));
+    // The red refill after move one puts three more reds on the board before the loop.
+    expect(s.history).toEqual([
+      { color: 'yellow', cleared: 2, loop: false },
+      { color: 'red', cleared: 7, loop: true },
+    ]);
+  });
+
+  it('a no-op release leaves history untouched', () => {
+    const s = pointerUp(pointerDown(fixture(), 0), constantRng(0));
+    expect(s.history).toEqual([]);
   });
 
   it('pointerEnter without a chain is a no-op', () => {

@@ -30,6 +30,15 @@ The model is a set of pure functions over an immutable `GameState`. Every pointe
 transition: `pointerDown`, `pointerEnter`, `pointerUp`, `pointerCancel`. Randomness comes in through
 an injected `Rng`, so tests use fixed boards and seeded refills.
 
+## Daily puzzle
+
+The default mode. The board and every refill come from a seed hashed from the local calendar
+date, so everyone playing on the same day gets the same game. Accepted moves are saved locally and
+replayed on reload, which gives one attempt per day and survives a refresh. Finishing shows a
+result card: score, loop count, and a spoiler-free grid with a square per path clear and a circle
+per closed loop, shareable via the system share sheet or the clipboard. Streak, best, and games
+played are kept in local storage. Free play is a random board with a new-game button.
+
 ## Rules as implemented
 
 - A link must be orthogonally adjacent and the same color. Row edges do not wrap.

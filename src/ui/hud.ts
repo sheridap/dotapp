@@ -2,6 +2,8 @@ import type { GameState } from '../game/game';
 
 export interface Hud {
   render(state: GameState): void;
+  /** Free play owns the new-game button and the game-over banner; daily mode has its own card. */
+  setFreePlay(free: boolean): void;
 }
 
 /** Score, moves remaining, and the new-game control. */
@@ -23,11 +25,17 @@ export function createHud(root: HTMLElement, onNewGame: () => void): Hud {
   banner.hidden = true;
   root.append(banner);
 
+  let freePlay = true;
+
   return {
+    setFreePlay(free) {
+      freePlay = free;
+      button.hidden = !free;
+    },
     render(state) {
       score.textContent = String(state.score);
       moves.textContent = String(state.movesLeft);
-      banner.hidden = state.status !== 'over';
+      banner.hidden = !freePlay || state.status !== 'over';
       banner.textContent = `Game over. ${String(state.score)} dots.`;
     },
   };

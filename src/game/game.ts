@@ -1,10 +1,17 @@
 import { applyGravity, createBoard, isValidIndex, removeCells } from './board';
 import { cellsToClear, chainColor, startChain, stepChain, type Chain } from './chain';
-import { COLORS, type Board, type CellIndex, type Rng } from './types';
+import { COLORS, type Board, type CellIndex, type Color, type Rng } from './types';
 
 export const DEFAULT_MOVES = 30;
 
 export type GameStatus = 'playing' | 'over';
+
+/** One spent move, kept for the result card. */
+export interface MoveRecord {
+  readonly color: Color;
+  readonly cleared: number;
+  readonly loop: boolean;
+}
 
 /** Immutable snapshot of a game. Every transition returns a new state. */
 export interface GameState {
@@ -13,10 +20,18 @@ export interface GameState {
   readonly score: number;
   readonly movesLeft: number;
   readonly status: GameStatus;
+  readonly history: readonly MoveRecord[];
 }
 
 export function newGame(rng: Rng, moves: number = DEFAULT_MOVES): GameState {
-  return { board: createBoard(rng), chain: null, score: 0, movesLeft: moves, status: 'playing' };
+  return {
+    board: createBoard(rng),
+    chain: null,
+    score: 0,
+    movesLeft: moves,
+    status: 'playing',
+    history: [],
+  };
 }
 
 export function pointerDown(state: GameState, index: CellIndex): GameState {
@@ -39,8 +54,9 @@ export function pointerUp(state: GameState, rng: Rng): GameState {
   const cleared = cellsToClear(state.board, state.chain);
   if (cleared.size === 0) return { ...state, chain: null };
 
-  const loopColor = state.chain.closed ? chainColor(state.board, state.chain) : null;
-  const palette = loopColor === null ? COLORS : COLORS.filter((c) => c !== loopColor);
+  const color = chainColor(state.board, state.chain);
+  const loop = state.chain.closed;
+  const palette = loop ? COLORS.filter((c) => c !== color) : COLORS;
   const board = applyGravity(removeCells(state.board, cleared), rng, palette);
   const movesLeft = state.movesLeft - 1;
   return {
@@ -49,6 +65,7 @@ export function pointerUp(state: GameState, rng: Rng): GameState {
     score: state.score + cleared.size,
     movesLeft,
     status: movesLeft <= 0 ? 'over' : 'playing',
+    history: [...state.history, { color, cleared: cleared.size, loop }],
   };
 }
 
