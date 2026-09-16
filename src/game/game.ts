@@ -1,6 +1,6 @@
 import { applyGravity, createBoard, isValidIndex, removeCells } from './board';
-import { cellsToClear, startChain, stepChain, type Chain } from './chain';
-import type { Board, CellIndex, Rng } from './types';
+import { cellsToClear, chainColor, startChain, stepChain, type Chain } from './chain';
+import { COLORS, type Board, type CellIndex, type Rng } from './types';
 
 export const DEFAULT_MOVES = 30;
 
@@ -30,13 +30,18 @@ export function pointerEnter(state: GameState, index: CellIndex): GameState {
   return chain === state.chain ? state : { ...state, chain };
 }
 
-/** Release the pointer: clear what the chain earned, apply gravity, spend a move. */
+/**
+ * Release the pointer: clear what the chain earned, apply gravity, spend a move.
+ * After a closed loop the refill for that turn never uses the cleared color.
+ */
 export function pointerUp(state: GameState, rng: Rng): GameState {
   if (state.chain === null) return state;
   const cleared = cellsToClear(state.board, state.chain);
   if (cleared.size === 0) return { ...state, chain: null };
 
-  const board = applyGravity(removeCells(state.board, cleared), rng);
+  const loopColor = state.chain.closed ? chainColor(state.board, state.chain) : null;
+  const palette = loopColor === null ? COLORS : COLORS.filter((c) => c !== loopColor);
+  const board = applyGravity(removeCells(state.board, cleared), rng, palette);
   const movesLeft = state.movesLeft - 1;
   return {
     board,

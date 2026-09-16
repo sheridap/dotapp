@@ -34,6 +34,7 @@ an injected `Rng`, so tests use fixed boards and seeded refills.
 
 - A link must be orthogonally adjacent and the same color. Row edges do not wrap.
 - Stepping back onto the previous dot undoes the last link.
-- Revisiting any earlier dot in the path closes a loop. A closed loop clears the whole color.
+- Revisiting any earlier dot in the path closes a loop. A closed loop clears the whole color, and
+  the refill for that turn never uses that color.
 - Releasing on a single dot clears nothing and spends no move.
 - Cleared columns collapse downward and refill from the top.

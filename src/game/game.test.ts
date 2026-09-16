@@ -61,6 +61,23 @@ describe('game state machine', () => {
     expect(s.board.filter((c) => c === 'red')).toHaveLength(0);
   });
 
+  it('a closed loop excludes its color from the refill, whatever the rng says', () => {
+    for (let colorIndex = 0; colorIndex < 5; colorIndex++) {
+      let s = pointerDown(fixture(), 0);
+      for (const i of [1, 7, 6, 0]) s = pointerEnter(s, i);
+      s = pointerUp(s, constantRng(colorIndex));
+      expect(s.board.filter((c) => c === 'red')).toHaveLength(0);
+      expect(s.board).toHaveLength(36);
+    }
+  });
+
+  it('an open path still refills from the full palette', () => {
+    let s = pointerDown(fixture(), 13);
+    s = pointerEnter(s, 14);
+    s = pointerUp(s, constantRng(1)); // yellow, the color just cleared
+    expect(s.board[1]).toBe('yellow');
+  });
+
   it('ignores moves that are not valid extensions', () => {
     const s = pointerEnter(pointerDown(fixture(), 0), 2);
     expect(s.chain?.cells).toEqual([0]);
